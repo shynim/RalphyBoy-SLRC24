@@ -24,10 +24,9 @@ void botLoop(){
 
 void setup(){
   botSetup();
-  driver.turnLeft(80,80);
-  frontQtr.calibrate(2);
-  driver.turnRight(80,80);
-  rearQtr.calibrate(2);
+  
+  frontQtr.calibrate(1);
+  rearQtr.calibrate(1);
   driver.stop();
 
 }

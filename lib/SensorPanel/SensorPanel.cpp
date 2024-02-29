@@ -13,10 +13,10 @@ bool SensorPanel::calibrate(int seconds) {
     for (int i = 0; i < seconds * 40; i++) {
         SensorPanel::qtr.calibrate();
     }
-//    uint16_t maxSensorValues[] = {2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500,
-//                                  2500, 2500};
-//    uint16_t minSensorValues[] = {280, 280, 188, 276, 188, 276, 192, 276, 276, 280, 184, 184, 184, 92, 92, 92};
-//    qtr.virtualCalibrate(maxSensorValues, minSensorValues);
+   uint16_t maxSensorValues[] = {2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500,
+                                 2500, 2500};
+   uint16_t minSensorValues[] = {280, 280, 188, 276, 188, 276, 192, 276, 276, 280, 184, 184, 184, 92, 92, 92};
+   qtr.virtualCalibrate(maxSensorValues, minSensorValues);
     return true;
 }
 
