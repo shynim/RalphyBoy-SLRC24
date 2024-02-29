@@ -27,7 +27,7 @@ uint16_t SensorPanel::readLine(uint16_t *sensorValues) {
 void SensorPanel::read() {
     SensorPanel::position = SensorPanel::readLine(panelReading);
 
-    error = (int) position - 4000;
+    error = (int) position - 3500;
 
     for (int i = 0; i < SensorPanel::SensorCount; i++) {        
         rawReadings[i] = panelReading[i];

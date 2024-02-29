@@ -2,7 +2,7 @@
 #include <Arduino.h>
 
 const int baseSpeed = 80;
-const int maxSpeed = 110;
+const int maxSpeed = 130;
 
 void MotorDriver::init(int* leftPins,int* rightPins){
     leftPWM = leftPins[0];
@@ -39,7 +39,7 @@ void MotorDriver::stop() {
 
     analogWrite(leftPWM, 255);
     analogWrite(rightPWM, 255);
-    delay(1000);
+    delay(2000);
 }
 
 void MotorDriver::backward(int speed) {
@@ -120,7 +120,7 @@ void MotorDriver::brake(){
     delay(100);
 }
 
-void MotorDriver::applyLinePid(int correction, bool frwrd) {
+void MotorDriver::applyLinePid(int correction, bool frwrd = true) {
     int leftSpeed = baseSpeed + correction;
     int rightSpeed = baseSpeed - correction;
 
