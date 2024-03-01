@@ -37,3 +37,17 @@ int pid(int error, bool frwrd = true) {
 
     return correction;
 }
+
+const double eP = 0.4;
+const double eD = 2;
+
+int encoderPid(int error){
+    double p = error * eP;
+    double d = (error - prevError) *eD;
+
+    prevError = error;
+
+    int correction = (int)(p + d);
+
+    return correction;
+}

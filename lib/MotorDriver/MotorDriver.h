@@ -27,6 +27,8 @@ class MotorDriver{
 
         void applyLinePid(int correction, bool frwrd);
 
+        void applyEncoderPid(int correction);
+
         
     private:
         int leftPWM;

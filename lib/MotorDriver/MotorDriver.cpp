@@ -1,9 +1,6 @@
 #include <MotorDriver.h>
 #include <Arduino.h>
 
-const int baseSpeed = 80;
-const int maxSpeed = 130;
-
 void MotorDriver::init(int* leftPins,int* rightPins){
     leftPWM = leftPins[0];
     leftDirection[0] = leftPins[1];
@@ -120,6 +117,9 @@ void MotorDriver::brake(){
     delay(100);
 }
 
+const int baseSpeed = 80;
+const int maxSpeed = 130;
+
 void MotorDriver::applyLinePid(int correction, bool frwrd = true) {
     int leftSpeed = baseSpeed + correction;
     int rightSpeed = baseSpeed - correction;
@@ -142,4 +142,16 @@ void MotorDriver::applyLinePid(int correction, bool frwrd = true) {
 
     if(frwrd) forward(leftSpeed, rightSpeed);
     else backward(leftSpeed, rightSpeed);
+}
+
+const int correctionMax = 40;
+
+void MotorDriver::applyEncoderPid(int correction){
+    if(correction > correctionMax) correction = correctionMax;
+    if(correction < correctionMax * -1) correction = correctionMax * -1;
+
+    int leftSpeed = baseSpeed + correction;
+    int rightSpeed = baseSpeed - correction;
+
+
 }
