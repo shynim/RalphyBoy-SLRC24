@@ -153,5 +153,7 @@ void MotorDriver::applyEncoderPid(int correction){
     int leftSpeed = baseSpeed + correction;
     int rightSpeed = baseSpeed - correction;
 
+    forward(leftSpeed, rightSpeed);
+
 
 }
