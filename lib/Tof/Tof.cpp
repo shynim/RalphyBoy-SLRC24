@@ -8,7 +8,6 @@ Tof::Tof(int *settings){
 
 }
 void Tof::init(){
-    delay(50);
     digitalWrite(xshut, HIGH);
 
     Wire.begin();
@@ -43,16 +42,17 @@ void Tof::read(){
     int data = sensor.readRangeSingleMillimeters();
 
     if(data < 2200){
-        Serial.print(data);
+        //Serial.print(data);
         reading = data;
     }
     else{
-        Serial.print("Out of range");reading = -1;
+        //Serial.print("Out of range");
+        reading = -1;
         
     }
 
     if (sensor.timeoutOccurred()) { Serial.print(" TIMEOUT"); }
     
-    Serial.println();
+    //Serial.println();
 
 }

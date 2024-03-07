@@ -28,6 +28,9 @@ void turnRadar(int ang, int del){
     radarServo.attach(radarPin);
     radarServo.write(ang);
     delay(del);
+}
+
+void detachRadar(){
     radarServo.detach();
 }
 

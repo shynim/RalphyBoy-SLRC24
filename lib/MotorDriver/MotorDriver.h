@@ -21,13 +21,17 @@ class MotorDriver{
 
         void backward(int leftSpeed, int rightSpeed);
 
-        void stop();
+        void stop(int del = 1000);
 
         void brake();
 
         void applyLinePid(int correction, bool frwrd);
 
-        void applyEncoderPid(int correction);
+        void applyEncoderPid(int correction, int base);
+
+        void applyWallPid(int correction);
+
+        int applyDrivePid(int correction);
 
         
     private:

@@ -28,7 +28,7 @@ void MotorDriver::forward(int speed) {
     analogWrite(rightPWM, speed);
 }
 
-void MotorDriver::stop() {
+void MotorDriver::stop(int del = 1000) {
     digitalWrite(leftDirection[0], HIGH);
     digitalWrite(leftDirection[1], HIGH);
     digitalWrite(rightDirection[0], HIGH);
@@ -36,7 +36,7 @@ void MotorDriver::stop() {
 
     analogWrite(leftPWM, 255);
     analogWrite(rightPWM, 255);
-    delay(1000);
+    delay(del);
 }
 
 void MotorDriver::backward(int speed) {
@@ -114,7 +114,7 @@ void MotorDriver::brake(){
     digitalWrite(rightDirection[0], HIGH);
     digitalWrite(rightDirection[1], HIGH);
 
-    delay(100);
+    delay(0);
 }
 
 const int baseSpeed = 80;
@@ -144,16 +144,59 @@ void MotorDriver::applyLinePid(int correction, bool frwrd = true) {
     else backward(leftSpeed, rightSpeed);
 }
 
+
 const int correctionMax = 40;
 
-void MotorDriver::applyEncoderPid(int correction){
+void MotorDriver::applyEncoderPid(int correction, int base = baseSpeed){
     if(correction > correctionMax) correction = correctionMax;
     if(correction < correctionMax * -1) correction = correctionMax * -1;
 
-    int leftSpeed = baseSpeed + correction;
-    int rightSpeed = baseSpeed - correction;
+    int leftSpeed = abs(base) + correction;
+    int rightSpeed = abs(base) - correction;
+
+    if(base >= 0) forward(leftSpeed, rightSpeed);
+    else backward(leftSpeed, rightSpeed);
+}
+
+
+const int wallBaseSpeed = 70;
+
+void MotorDriver::applyWallPid(int correction){
+    if(correction > correctionMax){
+        correction = correctionMax;
+    }else if(correction < correctionMax * -1){
+        correction = correctionMax * -1;
+    }
+
+    int leftSpeed = wallBaseSpeed + correction;
+    int rightSpeed = wallBaseSpeed - correction;
+
+    if(leftSpeed < 40) leftSpeed = 40;
+    if(rightSpeed < 40) rightSpeed = 40;
 
     forward(leftSpeed, rightSpeed);
-
-
 }
+
+
+const int driveBaseSpeed = 60;
+const int driveMaxSpeed = 80;
+
+int MotorDriver::applyDrivePid(int correction){
+    if(correction > driveMaxSpeed){
+        correction = driveMaxSpeed;
+    }else if(correction < driveMaxSpeed * -1){
+        correction = driveMaxSpeed * -1;
+    }
+
+    if(correction <= driveBaseSpeed && correction >= 0){
+        correction = driveBaseSpeed;
+    }
+    if(correction >= -driveBaseSpeed && correction <= 0){
+        correction = -driveBaseSpeed;
+    }
+
+    // if(correction >= 0) forward(correction, correction);
+    // else backward(correction * -1, correction * -1);
+    return correction;
+}
+

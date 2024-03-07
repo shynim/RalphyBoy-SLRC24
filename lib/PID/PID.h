@@ -38,8 +38,8 @@ int pid(int error, bool frwrd = true) {
     return correction;
 }
 
-const double eP = 5;
-const double eD = 2;
+const double eP = 0.8;
+const double eD = 0.8;
 
 int encoderPid(int error){
     double p = error * eP;
@@ -48,6 +48,42 @@ int encoderPid(int error){
     prevError = error;
 
     int correction = (int)(p + d);
+
+    return correction;
+}
+
+const double wP = 8.5;
+const double wD = 30;
+const double wI = 0.008;
+
+int wallPid(int error){
+    totalError += error;
+
+    double p = error * wP;
+    double i = totalError * wI;
+    double d = (error - prevError) *wD;
+
+    prevError = error;
+
+    int correction = (int)(p + i + d);
+
+    return correction;
+}
+
+const double dP = 1;
+const double dD = 2;
+const double dI = 0.00005;
+
+int drivePid(int error){
+    totalError += error;
+
+    double p = error * dP;
+    double i = totalError * dI;
+    double d = (error - prevError) *dD;
+
+    prevError = error;
+
+    int correction = (int)(p + i + d);
 
     return correction;
 }
