@@ -176,27 +176,3 @@ void MotorDriver::applyWallPid(int correction){
 
     forward(leftSpeed, rightSpeed);
 }
-
-
-const int driveBaseSpeed = 60;
-const int driveMaxSpeed = 80;
-
-int MotorDriver::applyDrivePid(int correction){
-    if(correction > driveMaxSpeed){
-        correction = driveMaxSpeed;
-    }else if(correction < driveMaxSpeed * -1){
-        correction = driveMaxSpeed * -1;
-    }
-
-    if(correction <= driveBaseSpeed && correction >= 0){
-        correction = driveBaseSpeed;
-    }
-    if(correction >= -driveBaseSpeed && correction <= 0){
-        correction = -driveBaseSpeed;
-    }
-
-    // if(correction >= 0) forward(correction, correction);
-    // else backward(correction * -1, correction * -1);
-    return correction;
-}
-

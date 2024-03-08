@@ -69,21 +69,3 @@ int wallPid(int error){
 
     return correction;
 }
-
-const double dP = 1;
-const double dD = 2;
-const double dI = 0.00005;
-
-int drivePid(int error){
-    totalError += error;
-
-    double p = error * dP;
-    double i = totalError * dI;
-    double d = (error - prevError) *dD;
-
-    prevError = error;
-
-    int correction = (int)(p + i + d);
-
-    return correction;
-}

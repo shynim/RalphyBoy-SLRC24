@@ -7,6 +7,7 @@
 #include <SoftwareSerial.h>
 #include <Sonic.h>
 #include <MetalDetector.h>
+#include <Arm.h>
 
 Sonic wallSonic(41, A12, 100);
 
@@ -132,6 +133,10 @@ void botSetup(){
 
   initRadar();
   initMetalDetector();
+
+  initElbow(35,180);
+  initWrist(0,180);
+  initGripper(0,180);
   
   driver.init(const_cast<int *>(leftPins), const_cast<int *>(rightPins));
 
@@ -151,8 +156,8 @@ void botLoop(){
     Serial.print("  ");
   }
   Serial.println();
-  // int correction = pid(rearQtr.error * 1, false);
-  // driver.applyLinePid(correction, false);
+  int correction = pid(rearQtr.error * 1, false);
+  driver.applyLinePid(correction, false);
 
 }
 
@@ -191,7 +196,7 @@ void setup(){
 
 void loop(){
 
-  Serial.println(detectMetal());
+  // Serial.println(detectMetal());
 
   // while(true){
   //   Serial.print(int(leftEncoder * 0.96));
@@ -251,5 +256,24 @@ void loop(){
   // frontLox.shut();
 
   // oneWheelTurn('l', 420);
+  // attachGripper();
+  // gripper.write(60);
 
+  positionArm();
+  delay(3000);
+
+  armDown(500);
+  delay(5000);
+
+  grabCube();
+
+  while(true){
+
+
+  }
+  
+  detachElbow();
+  detachWrist();
+
+  
 }
