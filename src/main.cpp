@@ -8,8 +8,10 @@
 #include <Sonic.h>
 #include <MetalDetector.h>
 #include <Arm.h>
+#include <Lox.h>
 
 Sonic wallSonic(41, A12, 100);
+Sonic backSonic(43, 429 , 100);
 
 SensorPanel frontQtr(const_cast<uint8_t *>((const uint8_t[]) {25, 27, 31, 37, 39, 29, 35, 14}));
 SensorPanel rearQtr(const_cast<uint8_t *>((const uint8_t[]) {24, A0, 28, 30, 32, 34, 36, 38}));
@@ -48,7 +50,7 @@ void initEncoder(){
 }
 
 void breakForward(){
-  while(leftEncoder < 4){
+  while(leftEncoder < 5){
     driver.forward(255,255);
   }
   driver.brake();
@@ -56,22 +58,22 @@ void breakForward(){
 }
 
 void breakBackward(){
-  while(leftEncoder < 4){
+  while(leftEncoder < 5){
     driver.backward(255,255);
   }
   driver.brake();
 
 }
 
-void autoPosition(int frontGap){
+void autoPosition(int frontGap, char lox){
 
   int setPoint = frontGap; 
 
-  frontLox.init();
   initEncoder();
 
-  frontLox.read();
-  int driveErr = setPoint - int(frontLox.reading / 10);
+  int reading;
+  reading = lox == 'f'? readFrontLox() : readRadarLox();
+  int driveErr = setPoint - int(reading / 10);
 
   if(driveErr > 0 ){
     breakBackward();
@@ -81,8 +83,8 @@ void autoPosition(int frontGap){
   }
 
   while(true){
-    frontLox.read();
-    int driveErr = setPoint - int(frontLox.reading / 10);
+    reading = lox == 'f'? readFrontLox() : readRadarLox();
+    int driveErr = setPoint - int(reading / 10);
     
     int speed = 40 + (2 * abs(driveErr));
     if(driveErr > 0){
@@ -101,6 +103,15 @@ void autoPosition(int frontGap){
     }
   }
 
+}
+
+void goStraight(int distance){
+  initEncoder();
+  while(leftEncoder <= distance || rightEncoder <= distance){
+    int err = int(rightEncoder * 1) - int(leftEncoder * 0.96);
+    int correction = encoderPid(err);
+    driver.applyEncoderPid(correction, 80);
+  }
 }
 
 void oneWheelTurn(char dir, int distance){
@@ -145,19 +156,23 @@ void botSetup(){
   frontLox.shut();
   radarLox.shut();
 
+  initLoxes();
+
+  frontQtr.calibrate(1000);
+
 }
 
 void botLoop(){
-  rearQtr.read();
+  //rearQtr.read();
   frontQtr.read();
 
   for(int i = 0;i < 8; i++){
-    Serial.print(rearQtr.rawReadings[i]);
+    Serial.print(frontQtr.rawReadings[i]);
     Serial.print("  ");
   }
   Serial.println();
-  int correction = pid(rearQtr.error * 1, false);
-  driver.applyLinePid(correction, false);
+  // int correction = pid(frontQtr.error * -1, true);
+  // driver.applyLinePid(correction, true);
 
 }
 
@@ -184,9 +199,193 @@ void wallFollow(int time, int startTime){
   }
 }
 
+void placeCube(){
+  positionArm();
+  delay(2000);
+
+  // armDown(500,true);
+  // delay(2000);
+
+  // grabCube();
+  // delay(2000);
+
+  // armUp(2000);
+  // delay(2000);
+
+  // armDown(1000, false);
+  // delay(2000);
+
+  // spreadGripper();
+  // delay(2000);
+
+  // breakBackward();
+  // initEncoder();
+
+  // while(leftEncoder < 60 || rightEncoder < 60){
+  //   driver.backward(60,60);
+  //   Serial.print(int(leftEncoder * 0.96));
+  //   Serial.print("   ");
+  //   Serial.print(rightEncoder);
+  //   Serial.println();
+  // }
+  // driver.stop();
+  // delay(2000);
+
+  // writeElbow(120);
+  // delay(1000);
+
+  // positionArm();
+  // delay(2000);
+
+  armDownClose();
+  delay(5000);
+
+  spreadGripper();
+  delay(2000);
+
+  grabCube();
+  delay(2000);
+
+  writeElbow(50);
+  delay(50000);
+
+}
+
+bool checkMiddleRadarPos(){
+  turnRadar(65,500);
+  int reading = readRadarLox();
+  if(reading < 100 && reading != -1){
+    return true;
+  }else{
+    return false;
+  }
+}
+
+void trashYard(){
+
+  bool wallFound = false;
+  int radarState = 0; //1->2->3 ===> 20->55->90
+
+  centerRadar();
+  delay(100);
+
+  breakForward();
+
+  while(true){
+
+    int reading = readFrontLox();
+    if(reading < 150 && reading != -1){
+      driver.stop(100);
+      radarState = 0;
+      break;
+    }
+
+    turnRadar(50,0);
+    int startTime = millis();
+    wallFollow(60, startTime);
+    reading = readRadarLox();
+    if(reading < 150 && reading != -1){
+      driver.stop(100);
+      radarState = 1;
+      if(checkMiddleRadarPos()){
+        radarState = 2;
+      }
+      break;
+    }
+    // Serial.print(radarLox.reading);
+    // Serial.print("  ");
+
+    turnRadar(70,0);
+    startTime = millis();
+    wallFollow(60, startTime);
+    reading = readRadarLox();
+    if(reading < 150 && reading != -1){
+      driver.stop(100);
+      radarState = 2;
+      break;
+    }
+    // Serial.print(radarLox.reading);
+    // Serial.print("  ");
+
+    turnRadar(90,0);
+    startTime = millis();
+    wallFollow(60, startTime);
+    reading = readRadarLox();
+    if(reading < 150 && reading != -1){
+      driver.stop(100);
+      radarState = 3;
+      if(checkMiddleRadarPos()){
+        radarState = 2;
+      }
+      break;
+    }
+
+  }
+  
+  turnRadar(90,75);
+
+  int reading = readRadarLox();
+
+  if(reading < 200 && reading != -1){
+    if(readFrontLox() < 150){
+      wallFound = true;
+    }
+  }
+
+  if(wallFound){
+    autoPosition(11, 'f');
+    oneWheelTurn('l', 420);
+    
+  }else{
+    if(radarState == 0){
+      autoPosition(15, 'f');
+    }else if(radarState == 1){
+      turnRadar(50, 75);
+      autoPosition(15, 'r');
+    }
+    else if(radarState == 2){
+      turnRadar(70, 75);
+      autoPosition(15, 'r');
+    }else{
+      turnRadar(90, 75);
+      autoPosition(15, 'r');
+    }
+
+    oneWheelTurn('l', 420);
+
+    if(radarState == 0){ 
+      oneWheelTurn('r', 420);
+      delay(100000);
+    }else if(radarState == 1){
+      breakForward();
+      goStraight(50);
+      driver.stop();
+      oneWheelTurn('r', 420);
+      delay(100000);
+    
+    }else if(radarState == 2){
+      breakForward();
+      goStraight(100);
+      driver.stop();
+      oneWheelTurn('r', 420);
+      delay(100000);
+      
+    }else{
+      driver.stop();
+      delay(10000000);
+      
+    }    
+  }
+
+
+  
+}
+
 void setup(){
   delay(50);
   botSetup();
+
+  positionArm();
   
   // frontQtr.calibrate(1);
   // rearQtr.calibrate(1);
@@ -195,6 +394,10 @@ void setup(){
 }
 
 void loop(){
+  // trashYard();
+  //placeCube();
+  attachGripper();
+  grabCube();
 
   // Serial.println(detectMetal());
 
@@ -210,70 +413,29 @@ void loop(){
   // }
   
 
-  // Serial.print("start");
-  // centerRadar();
-  // delay(100);
-  // radarLox.init();
-  // breakForward();
-
-  // while(true){
-  //   turnRadar(20,0);
-  //   int startTime = millis();
-  //   wallFollow(75, startTime);
-  //   readRadar();
-  //   if(radarLox.reading < 200 && radarLox.reading != -1){
-  //     driver.stop(100);
-  //     break;
-  //   }
-  //   // Serial.print(radarLox.reading);
-  //   // Serial.print("  ");
-
-  //   turnRadar(55,0);
-  //   startTime = millis();
-  //   wallFollow(75, startTime);
-  //   readRadar();
-  //   if(radarLox.reading < 150 && radarLox.reading != -1){
-  //     driver.stop(100);
-  //     break;
-  //   }
-  //   // Serial.print(radarLox.reading);
-  //   // Serial.print("  ");
-
-  //   turnRadar(90,0);
-  //   startTime = millis();
-  //   wallFollow(75, startTime);
-  //   readRadar();
-  //   if(radarLox.reading < 150 && radarLox.reading != -1){
-  //     driver.stop(100);
-  //     break;
-  //   }
-
-  // }
-
-  // radarLox.shut();
-
-  // autoPosition(11);
-  // frontLox.shut();
-
-  // oneWheelTurn('l', 420);
   // attachGripper();
   // gripper.write(60);
 
-  positionArm();
-  delay(3000);
 
-  armDown(500);
-  delay(5000);
+  // breakForward();
+  // while(leftEncoder < 20000000 || rightEncoder < 200000000){
+  //   botLoop();
 
-  grabCube();
-
-  while(true){
-
-
-  }
+  // }
+  // driver.stop();
+  // delay(10000);
   
-  detachElbow();
-  detachWrist();
+  // detachElbow();
+  // detachWrist();
 
+  // radarLox.init();
+  
+  // while(true){
+  //   int startTime = millis();
+  //   readRadar();
+  //   Serial.print(radarLox.reading);
+  //   Serial.print("  ");
+  //   Serial.println(millis() - startTime);
+  // }
   
 }

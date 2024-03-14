@@ -75,20 +75,27 @@ void writeGripper(int ang){
 
 void grabCube(){
     attachGripper();
-    gripper.write(55);
+    gripper.write(23);
     delay(100);
+}
+
+void spreadGripper(){
+    attachGripper();
+    gripper.write(80);
+    delay(80);
+    detachGripper();
 
 }
 
-int elbowStartPos = 30;
+int elbowStartPos = 40;
 int wristStartPos = 5;
 
 int elbowDownPos = 155;
-int wristStraightPos = 125;
+int wristStraightPos = 115;
 
 void positionArm(){
     attachGripper();
-    writeGripper(40);
+    writeGripper(0);
     delay(500);
     detachGripper();
 
@@ -104,7 +111,7 @@ void positionArm(){
 
 }
 
-void armDown(int time){
+void armDown(int time, bool spread){
     attachElbow();
     attachWrist();
     attachGripper();
@@ -127,10 +134,52 @@ void armDown(int time){
             writeWrist(++wristAng);
             startTimeWrist = millis();
         }
-        if(elbowAng == 120){
-            writeGripper(100);
+        if(elbowAng == 120 && spread){
+            spreadGripper();
         }
 
     }
+
+}
+
+void armUp(int time){
+    attachElbow();
+    attachWrist();
+    attachGripper();
+
+    int elbowDelay = int(time / (elbowDownPos - elbowStartPos));
+    int wristDelay = int(time / (wristStraightPos - wristStartPos));
+
+    int elbowAng = elbowDownPos;
+    int wristAng = wristStraightPos;
+
+    int startTimeElbow = millis();
+    int startTimeWrist = millis();
+
+    while(elbowAng > elbowStartPos || wristAng > wristStartPos){
+        if((millis() - startTimeElbow) >= elbowDelay && elbowAng > elbowStartPos){
+            writeElbow(--elbowAng);
+            startTimeElbow = millis();
+        }
+        if((millis() - startTimeWrist) >= wristDelay && wristAng > wristStartPos){
+            writeWrist(--wristAng);
+            startTimeWrist = millis();
+        }
+
+    }
+
+}
+
+void armDownClose(){
+    attachElbow();
+    attachWrist();
+    attachGripper();
+
+    writeWrist(45);
+    delay(500);
+    writeElbow(83);
+    delay(500);
+    writeWrist(5);
+    delay(500);
 
 }

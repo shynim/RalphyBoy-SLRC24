@@ -3,9 +3,9 @@
 
 #endif //SLRC24_PID_H
 
-const double fP = 0.1;
-const double fI = 0;
-const double fD = 0.6;
+const double fP = 0.015;
+const double fI = 0.000;
+const double fD = 0.052;
 
 const double bP = 0.05;
 const double bI = 0;

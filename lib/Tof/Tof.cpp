@@ -9,7 +9,6 @@ Tof::Tof(int *settings){
 }
 void Tof::init(){
     digitalWrite(xshut, HIGH);
-
     Wire.begin();
 
     sensor.setTimeout(500);

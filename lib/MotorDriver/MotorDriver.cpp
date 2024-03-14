@@ -28,7 +28,7 @@ void MotorDriver::forward(int speed) {
     analogWrite(rightPWM, speed);
 }
 
-void MotorDriver::stop(int del = 1000) {
+void MotorDriver::stop(int del) {
     digitalWrite(leftDirection[0], HIGH);
     digitalWrite(leftDirection[1], HIGH);
     digitalWrite(rightDirection[0], HIGH);
@@ -117,8 +117,8 @@ void MotorDriver::brake(){
     delay(0);
 }
 
-const int baseSpeed = 80;
-const int maxSpeed = 130;
+const int baseSpeed = 65;
+const int maxSpeed = 115;
 
 void MotorDriver::applyLinePid(int correction, bool frwrd = true) {
     int leftSpeed = baseSpeed + correction;
@@ -159,7 +159,7 @@ void MotorDriver::applyEncoderPid(int correction, int base = baseSpeed){
 }
 
 
-const int wallBaseSpeed = 70;
+const int wallBaseSpeed = 65;
 
 void MotorDriver::applyWallPid(int correction){
     if(correction > correctionMax){
