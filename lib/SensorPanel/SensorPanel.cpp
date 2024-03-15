@@ -31,7 +31,7 @@ void SensorPanel::read() {
 
     for (int i = 0; i < SensorPanel::SensorCount; i++) {        
         rawReadings[i] = panelReading[i];
-        panelReading[i] = panelReading[i] > 500 ? 1 : 0;
+        panelReading[i] = panelReading[i] > 500 ? 0 : 1;
     }
 
     SensorPanel::updatePattern();
@@ -40,7 +40,7 @@ void SensorPanel::read() {
 
 void SensorPanel::updatePattern() {
     SensorPanel::isMiddle = false;
-    for (int i = 6; i <= 9; i++) {
+    for (int i = 3; i <= 4; i++) {
         if (SensorPanel::panelReading[i] == 1) {
             SensorPanel::isMiddle = true;
         }
@@ -48,18 +48,19 @@ void SensorPanel::updatePattern() {
 
     int sensorCount = 0;
 
-    for (int i = 0; i < 16; i++) {
+    for (int i = 0; i < 8; i++) {
         sensorCount += panelReading[i];
     }
 
     left = false;
     right = false;
-    for (int i = 0; i < 2; i++) {
+
+    for (int i = 0; i < 1; i++) {
         if (SensorPanel::panelReading[i] == 1) {
-            left = true;
-        }
-        if (SensorPanel::panelReading[15 - i] == 1) {
             right = true;
+        }
+        if (SensorPanel::panelReading[7 - i] == 1) {
+            left = true;
         }
     }
 

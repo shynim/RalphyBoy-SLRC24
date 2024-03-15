@@ -4,12 +4,12 @@
 #endif //SLRC24_PID_H
 
 const double fP = 0.015;
-const double fI = 0.000;
+const double fI = 0;
 const double fD = 0.052;
 
-const double bP = 0.05;
+const double bP = 0.03;
 const double bI = 0;
-const double bD = 0.4;
+const double bD = 0.1;
 
 int totalError = 0;
 int prevError = 0;

@@ -117,8 +117,8 @@ void MotorDriver::brake(){
     delay(0);
 }
 
-const int baseSpeed = 65;
-const int maxSpeed = 115;
+const int baseSpeed = 80;
+const int maxSpeed = 130;
 
 void MotorDriver::applyLinePid(int correction, bool frwrd = true) {
     int leftSpeed = baseSpeed + correction;
