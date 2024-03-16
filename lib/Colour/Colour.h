@@ -91,3 +91,14 @@ char getColour(){
     return 'B';
   }
 }
+
+bool checkGreen(){
+  getGreenPW();
+  getBluePW();
+
+  if(greenValue > blueValue){
+    return true;
+  }else{
+    return false;
+  }
+}

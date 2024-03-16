@@ -25,9 +25,9 @@ class MotorDriver{
 
         void brake();
 
-        void applyLinePid(int correction, bool frwrd);
+        void applyLinePid(int correction, bool frwrd, int base = 80, int max = 130);
 
-        void applyEncoderPid(int correction, int base);
+        void applyEncoderPid(int correction, int base = 80);
 
         void applyWallPid(int correction);
 

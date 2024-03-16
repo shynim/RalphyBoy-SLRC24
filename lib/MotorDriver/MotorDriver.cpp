@@ -117,12 +117,9 @@ void MotorDriver::brake(){
     delay(0);
 }
 
-const int baseSpeed = 80;
-const int maxSpeed = 130;
-
-void MotorDriver::applyLinePid(int correction, bool frwrd = true) {
-    int leftSpeed = baseSpeed + correction;
-    int rightSpeed = baseSpeed - correction;
+void MotorDriver::applyLinePid(int correction, bool frwrd, int base, int max) {
+    int leftSpeed = base + correction;
+    int rightSpeed = base - correction;
 
     if (leftSpeed < 0) {
         leftSpeed = 0;
@@ -132,12 +129,12 @@ void MotorDriver::applyLinePid(int correction, bool frwrd = true) {
         rightSpeed = 0;
     }
 
-    if (leftSpeed >= maxSpeed) {
-        leftSpeed = maxSpeed;
+    if (leftSpeed >= max) {
+        leftSpeed = max;
     }
 
-    if (rightSpeed >= maxSpeed) {
-        rightSpeed = maxSpeed;
+    if (rightSpeed >= max) {
+        rightSpeed = max;
     }
 
     if(frwrd) forward(leftSpeed, rightSpeed);
@@ -147,7 +144,7 @@ void MotorDriver::applyLinePid(int correction, bool frwrd = true) {
 
 const int correctionMax = 40;
 
-void MotorDriver::applyEncoderPid(int correction, int base = baseSpeed){
+void MotorDriver::applyEncoderPid(int correction, int base){
     if(correction > correctionMax) correction = correctionMax;
     if(correction < correctionMax * -1) correction = correctionMax * -1;
 

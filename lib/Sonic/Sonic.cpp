@@ -20,5 +20,10 @@ int Sonic::readMili(){
 
 int Sonic::readCenti(){
     delay(5);
-    return sonic.ping_cm();
+    int reading = sonic.ping_cm();
+    if(reading < 100){
+        return reading;
+    }else{
+        return -1;
+    }
 }

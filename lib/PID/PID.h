@@ -7,9 +7,9 @@ const double fP = 0.015;
 const double fI = 0;
 const double fD = 0.052;
 
-const double bP = 0.03;
+const double bP = 0.035;
 const double bI = 0;
-const double bD = 0.1;
+const double bD = 0.5;
 
 int totalError = 0;
 int prevError = 0;
@@ -38,8 +38,8 @@ int pid(int error, bool frwrd = true) {
     return correction;
 }
 
-const double eP = 0.8;
-const double eD = 0.8;
+const double eP = 0.4;
+const double eD = 2;
 
 int encoderPid(int error){
     double p = error * eP;

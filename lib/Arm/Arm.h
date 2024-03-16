@@ -73,15 +73,15 @@ void writeGripper(int ang){
     gripper.write(ang);
 }
 
-void grabCube(){
+void gripCube(){
     attachGripper();
-    gripper.write(23);
+    gripper.write(13);
     delay(100);
 }
 
 void spreadGripper(){
     attachGripper();
-    gripper.write(80);
+    gripper.write(60);
     delay(80);
     detachGripper();
 
