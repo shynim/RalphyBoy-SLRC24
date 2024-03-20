@@ -38,7 +38,39 @@ int pid(int error, bool frwrd = true) {
     return correction;
 }
 
-const double eP = 0.4;
+const double fbP = 0.025;
+const double fbI = 0;
+const double fbD = 0.05;
+
+const double bbP = 0.035;
+const double bbI = 0;
+const double bbD = 0.25;
+
+int boxPid(int error, bool frwrd = true) {
+    totalError += error;
+
+    double p;
+    double i;
+    double d;
+
+    if(frwrd){
+        p = error * fbP;
+        i = totalError * fbI;
+        d = (error - prevError) * fbD;
+    }else{
+        p = error * bbP;
+        i = totalError * bbI;
+        d = (error - prevError) * bbD;
+    }
+
+    prevError = error;
+
+    int correction = (int)(p + i + d);
+
+    return correction;
+}
+
+const double eP = 0.8;
 const double eD = 2;
 
 int encoderPid(int error){

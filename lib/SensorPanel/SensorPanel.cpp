@@ -72,7 +72,7 @@ void SensorPanel::updatePattern() {
         SensorPanel::pattern = 'L';
     } else if (right && SensorPanel::isMiddle) {
         SensorPanel::pattern = 'R';
-    } else {
+    }else{
         SensorPanel::pattern = 1;
     }
 

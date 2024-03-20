@@ -22,14 +22,16 @@ int greenValue;
 int blueValue;
 
 void initColour(){
-    pinMode(S0, OUTPUT);
-    pinMode(S1, OUTPUT);
-    pinMode(S2, OUTPUT);
-    pinMode(S3, OUTPUT);
-    pinMode(sensorOut, INPUT);
+  pinMode(S0, OUTPUT);
+  pinMode(S1, OUTPUT);
+  pinMode(S2, OUTPUT);
+  pinMode(S3, OUTPUT);
+  pinMode(sensorOut, INPUT);
+  pinMode(A13, INPUT);
 
-    digitalWrite(S0, HIGH);
-    digitalWrite(S1, LOW);
+  digitalWrite(S0, HIGH);
+  digitalWrite(S1, LOW);
+
 
 }
 
@@ -92,13 +94,45 @@ char getColour(){
   }
 }
 
-bool checkGreen(){
+bool checkGreenWall(){
   getGreenPW();
   getBluePW();
+
+  digitalWrite(S2, LOW);
+  digitalWrite(S3, LOW);
 
   if(greenValue > blueValue){
     return true;
   }else{
     return false;
   }
+
+}
+
+bool checkGreenColourJunction(){
+  digitalWrite(S2, HIGH);
+  delay(5);
+  int blue = 0;
+  int green = 0;
+  for(int i = 0; i < 10; i++){
+    blue += analogRead(A13);
+  }
+  blue /= 10;
+  digitalWrite(S2, LOW);
+  delay(5);
+  digitalWrite(S3, HIGH);
+  delay(5);
+  for(int i = 0; i < 10; i++){
+    green += analogRead(A13);
+  }
+  green /= 10;
+  digitalWrite(S3, LOW);
+  delay(5);
+
+  if(green - blue > 80){
+    return true;
+  }else{
+    return false;
+  }
+
 }

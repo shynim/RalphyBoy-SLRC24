@@ -75,13 +75,13 @@ void writeGripper(int ang){
 
 void gripCube(){
     attachGripper();
-    gripper.write(13);
+    gripper.write(4);
     delay(100);
 }
 
 void spreadGripper(){
     attachGripper();
-    gripper.write(60);
+    gripper.write(55);
     delay(80);
     detachGripper();
 
@@ -178,6 +178,8 @@ void armDownClose(){
     writeWrist(45);
     delay(500);
     writeElbow(83);
+    delay(500);
+    spreadGripper();
     delay(500);
     writeWrist(5);
     delay(500);

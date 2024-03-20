@@ -96,7 +96,7 @@ int detectMetal(){
     
     // one permille change = 2 ticks/s
     if (diff == 0) flash_period = 1000000;
-    else flash_period = avgsum / (2 * abs(diff));
+    else flash_period = avgsum / (1 * abs(diff));
 
     return beepCount;
 }

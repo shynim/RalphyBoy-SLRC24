@@ -40,9 +40,14 @@ unsigned long rightCount = 1;
 const int pushDistanceForward = 150;
 const int pushDistanceBackward = 90;
 
-int redToJunc = 0;
-int greenToJunc = 0;
-int blueToJunc = 0;
+char wallColour;
+
+int juncToSemicircle = 0;
+int juncToCircle = 0;
+
+int turnSpeed = 100;
+int baseSpeed = 90;
+boolean boxPicked = false;
 
 boolean rightBox = false;
 boolean frontBox = false;
@@ -50,6 +55,7 @@ boolean frontBox = false;
 void countLeftOut1(){
   leftEncoder += 1;
 }
+
 void countRightOut1(){
   rightEncoder += 1;
 }
@@ -175,10 +181,10 @@ void autoLinePosition(int frontGap, char lox, boolean limitSpeed){
 
 }
 
-void goStraight(boolean frwrd){
+void goStraight(boolean frwrd, int baseSpeed = 80){
   int err = int(rightEncoder * 1) - int(leftEncoder * 0.96);
   int correction = encoderPid(err);
-  int speed = frwrd == true ? 80 : -80;
+  int speed = frwrd == true ? baseSpeed : -baseSpeed;
   driver.applyEncoderPid(correction, speed);
 
 }
@@ -194,9 +200,8 @@ void pushForward(int distance, boolean frwrd){
   driver.stop(100);
 }
 
-int pushLineForward(int distance, boolean frwrd, boolean metalDetect){
+int pushLineForward(int distance, boolean frwrd, boolean metalDetect, int baseSpeed = 60){
   initEncoder();
-  int baseSpeed = 60;
   int count = 0;
   if(frwrd){
     while(leftEncoder <= distance || rightEncoder <= distance){
@@ -247,7 +252,7 @@ void turnLeft90(){
   rightCount = leftCount;
   while(leftEncoder < leftCount || rightEncoder < rightCount){
     printEncoder();
-    driver.turnLeft(90, 90);
+    driver.turnLeft(turnSpeed, turnSpeed);
   }
   driver.stop(100);
 }
@@ -258,67 +263,67 @@ void turnRight90(){
   rightCount = leftCount;
   while(leftEncoder < leftCount || rightEncoder < rightCount){
     printEncoder();
-    driver.turnRight(90, 90);
+    driver.turnRight(turnSpeed, turnSpeed);
     
   }
   driver.stop(100);
 }
 
 void turnRightTillMiddle(boolean frwrd){
-  driver.turnRight(90,90);
-  delay(150);
+  driver.turnRight(turnSpeed,turnSpeed);
+  delay(200);
   if(frwrd){
     frontQtr.read();
     while(frontQtr.panelReading[3] == 1){
-      driver.turnRight(90, 90);
+      driver.turnRight(turnSpeed, turnSpeed);
       frontQtr.read();
     }
     
     frontQtr.read();
     while(frontQtr.panelReading[3] != 1){
-      driver.turnRight(90, 90);
+      driver.turnRight(turnSpeed, turnSpeed);
       frontQtr.read();
     }
   }else{
     rearQtr.read();
     while(rearQtr.panelReading[3] == 1){
-      driver.turnRight(90, 90);
+      driver.turnRight(turnSpeed, turnSpeed);
       rearQtr.read();
     }
     
     rearQtr.read();
     while(rearQtr.panelReading[3] != 1){
-      driver.turnRight(90, 90);
+      driver.turnRight(turnSpeed, turnSpeed);
       rearQtr.read();
     }
   }
 }
 
 void turnLeftTillMiddle(boolean frwrd){
-  driver.turnLeft(90,90);
-  delay(150);
+  driver.turnLeft(turnSpeed,turnSpeed);
+  delay(200);
   if(frwrd){
     frontQtr.read();
     while(frontQtr.panelReading[4] == 1){
-      driver.turnLeft(90, 90);
+      driver.turnLeft(turnSpeed, turnSpeed);
       frontQtr.read();
     }
     
     frontQtr.read();
     while(frontQtr.panelReading[4] != 1){
-      driver.turnLeft(90, 90);
+      driver.turnLeft(turnSpeed, turnSpeed);
       frontQtr.read();
     }
   }else{
     rearQtr.read();
     while(rearQtr.panelReading[4] == 1){
-      driver.turnLeft(90, 90);
+      driver.turnLeft(turnSpeed, turnSpeed);
       rearQtr.read();
     }
     
     rearQtr.read();
     while(rearQtr.panelReading[4] != 1){
-      driver.turnLeft(90, 90);
+      driver.turnLeft(turnSpeed, turnSpeed);
       rearQtr.read();
     }
   }
@@ -330,33 +335,20 @@ void turnLeftToCircle(){
   rightCount = leftCount;
   while(leftEncoder < leftCount || rightEncoder < rightCount){
     printEncoder();
-    driver.turnLeft(90, 90);
+    driver.turnLeft(turnSpeed, turnSpeed);
   }
   driver.stop(100);
 }
 
 void turnBack(){
   initEncoder();
-  leftCount += 380;
+  leftCount += 410;
   rightCount = leftCount;
   while(leftEncoder < leftCount || rightEncoder < rightCount){
     printEncoder();
-    driver.turnLeft(90, 90);
+    driver.turnLeft(turnSpeed, turnSpeed);
   }
   driver.stop();
-}
-
-
-void botStart(){
-  
-  while(true){
-    int reading = readFrontLox();
-    if(reading < 100 && frontLox.reading != -1){
-      delay(1000);
-      break;
-    }
-  }
-
 }
 
 void wallFollow(int time, int startTime){
@@ -365,58 +357,6 @@ void wallFollow(int time, int startTime){
     int correction = wallPid(err);
     driver.applyWallPid(correction * -1);
   }
-}
-
-void placeCube(){
-  positionArm();
-  delay(2000);
-
-  // armDown(500,true);
-  // delay(2000);
-
-  // grabCube();
-  // delay(2000);
-
-  // armUp(2000);
-  // delay(2000);
-
-  // armDown(1000, false);
-  // delay(2000);
-
-  // spreadGripper();
-  // delay(2000);
-
-  // breakBackward();
-  // initEncoder();
-
-  // while(leftEncoder < 60 || rightEncoder < 60){
-  //   driver.backward(60,60);
-  //   Serial.print(int(leftEncoder * 0.96));
-  //   Serial.print("   ");
-  //   Serial.print(rightEncoder);
-  //   Serial.println();
-  // }
-  // driver.stop();
-  // delay(2000);
-
-  // writeElbow(120);
-  // delay(1000);
-
-  // positionArm();
-  // delay(2000);
-
-  armDownClose();
-  delay(5000);
-
-  spreadGripper();
-  delay(2000);
-
-  gripCube();
-  delay(2000);
-
-  writeElbow(50);
-  delay(50000);
-
 }
 
 bool checkMiddleRadarPos(){
@@ -554,7 +494,7 @@ void lineFollowForward(char turn = 'n', boolean checkBoxes = false){
     frontQtr.read();
     if (frontQtr.pattern == 1) {
       int correction = pid(frontQtr.error * -1, true);
-      driver.applyLinePid(correction, true);
+      driver.applyLinePid(correction, true, baseSpeed, baseSpeed + 50);
 
     }else{
       char pattern = frontQtr.pattern;
@@ -614,7 +554,7 @@ void lineFollowForward(char turn = 'n', boolean checkBoxes = false){
 
       if(checkBoxes){
         int reading = readFrontLox();
-        if(reading < 400 && reading != -1){
+        if(reading < 500 && reading != -1){
           light(2, 'r');
           frontBox = true;
         }
@@ -662,7 +602,7 @@ void lineFollowBackward(char turn = 'n'){
     rearQtr.read();
     if (rearQtr.pattern == 1) {
       int correction = pid(rearQtr.error, false);
-      driver.applyLinePid(correction, false);
+      driver.applyLinePid(correction, false, baseSpeed, baseSpeed + 50);
 
     }else{
       char pattern = rearQtr.pattern;
@@ -741,26 +681,82 @@ void lineFollowBackward(char turn = 'n'){
   
 }
 
-double checkReadings(uint8_t *readings, int size) {
-    int sum = 0;
-    for (int i = 0; i < size; ++i) {
-        sum += readings[i];
-    }
-    double mean = sum / size;
+void wall(){
 
-    double squaredDiffSum = 0.0;
-    for (int i = 0; i < size; ++i) {
-        squaredDiffSum += pow(readings[i] - mean, 2);
-    }
-    double variance = squaredDiffSum / size;
-    double stdDeviation = sqrt(variance);
+  lineFollowBackward();
 
-    //double threshold = 0.1 * mean;
+  while(readBackLox() > 150){
+    rearQtr.read();
+    int correction = pid(rearQtr.error, false);
+    driver.applyLinePid(correction, false);
+  }
 
-    return stdDeviation;
+  autoLinePosition(4, 'b', false);
+  driver.stop();
+  delay(500);
+
+  bool green = checkGreenWall();
+  wallColour = green == true ? 'g' : 'b';
+
+  light(1, wallColour);
+  delay(100);
+  turnOffAllLeds();
+
+  lineFollowForward('r');
+  lineFollowForward();
+  lineFollowForward('l');
 }
 
-void circle(){
+void reachColourJunction(char colour){
+  if(colour == 'w'){
+    while(true){
+      frontQtr.read();
+      if(frontQtr.pattern == 'L' || frontQtr.pattern == 'R' || frontQtr.pattern == 'T'){
+        break;
+      }
+      int correction = pid(frontQtr.error, true);
+      driver.applyLinePid(correction * -1, true);
+    }
+  }else if(colour == 'b' || colour == 'g'){
+    initEncoder();
+    while(leftEncoder < juncToCircle){
+      frontQtr.read();
+      int correction = pid(frontQtr.error, true);
+      driver.applyLinePid(correction * -1, true);
+    }
+  }else{
+    initEncoder();
+    while(leftEncoder < juncToSemicircle + 220){
+      rearQtr.read();
+      int correction = pid(rearQtr.error, false);
+      driver.applyLinePid(correction, false, baseSpeed, baseSpeed + 50);
+    }
+  }
+  
+}
+
+char getJuctionColour(){
+  if(checkGreenColourJunction()){
+    return 'g';
+  }else{
+    return 'b';
+  }
+}
+
+void goToCircle(char colour){
+  int pushDistance = 180;
+  pushForward(pushDistance, true);
+
+  driver.stop(100);
+
+  if(colour == wallColour){
+    turnLeftTillMiddle(true);
+  }else{
+    turnRightTillMiddle(true);
+  }
+  driver.stop(100);
+
+  initEncoder();
   while(true){
     frontQtr.read();
     if(frontQtr.pattern == 'L' || frontQtr.pattern == 'R' || frontQtr.pattern == 'T'){
@@ -770,10 +766,39 @@ void circle(){
     driver.applyLinePid(correction * -1, true);
   }
 
+  juncToCircle = leftEncoder;
   pushForward(pushDistanceForward, true);
   driver.stop(100);
+  if(colour == wallColour){
+    turnRightTillMiddle(true);
+  }else{
+    turnLeftTillMiddle(true);
+  }
+  driver.stop(100);
 
-  turnLeftToCircle();
+}
+
+double checkReadings(uint8_t *readings, int size) {
+  int sum = 0;
+  for (int i = 0; i < size; ++i) {
+      sum += readings[i];
+  }
+  double mean = sum / size;
+
+  double squaredDiffSum = 0.0;
+  for (int i = 0; i < size; ++i) {
+      squaredDiffSum += pow(readings[i] - mean, 2);
+  }
+  double variance = squaredDiffSum / size;
+  double stdDeviation = sqrt(variance);
+
+  //double threshold = 0.1 * mean;
+
+  return stdDeviation;
+}
+
+void circle(){
+  lineFollowForward('l');
 
   initEncoder();
   int readCount = 0;
@@ -790,29 +815,321 @@ void circle(){
     }
   } 
 
-  driver.stop();
+  driver.stop(100);
 
   double std = checkReadings(const_cast<uint8_t *>(readings), readCount);
-  Serial.println(std);
+  int sum = 0;
+  for (int i = 0; i < readCount; ++i) {
+      sum += readings[i];
+  }
+  double mean = sum / readCount;
 
-}
+  // Serial.print(mean);
+  // Serial.print("  ");
+  // Serial.print(std);
+  // Serial.println();
 
-void wall(){
-  lineFollowBackward();
+  if(mean < 30.0 && std < 2.5){
+    light(2, 'g');
+  }else{
+    light(2, 'b');
+  }
 
-  while(readBackLox() > 150){
+  while(true){
     rearQtr.read();
+    if(rearQtr.pattern == 'R'){
+      break;
+    }
     int correction = pid(rearQtr.error, false);
     driver.applyLinePid(correction, false);
   }
-
-  autoLinePosition(4, 'b', false);
-  driver.stop();
-  delay(2000);
-
-  lineFollowForward('r');
+  pushForward(pushDistanceBackward, false);
+  driver.stop(100);
+  turnLeftTillMiddle(true);
+  driver.stop(100);
   lineFollowForward();
+  
 }
+
+void goToSemicircle(char colour){
+  pushForward(pushDistanceForward, true);
+  driver.stop(100);
+
+  if(colour == wallColour){
+    turnLeftTillMiddle(true);
+  }else{
+    turnRightTillMiddle(true);
+  }
+  driver.stop(100);
+  
+}
+
+int reachBox(){
+  
+  while(readFrontLox() > 150){
+    frontQtr.read();
+    int correction = pid(frontQtr.error, true);
+    driver.applyLinePid(correction * -1, true);
+  }
+
+  autoLinePosition(6, 'f', true);
+
+  int distance = 35;
+  int count = 0;
+  
+  count += pushLineForward(distance, true, false);
+
+  unsigned long startTime = millis();
+  while((millis() - startTime) < 1000){
+    count += detectMetal();
+  }
+  startTime = millis();
+  bool pushed = false;
+  while((millis() - startTime) < 1000){
+    if(!pushed){
+      breakForward();
+      initEncoder();
+      while(leftEncoder < 25 || rightEncoder < 25){
+        frontQtr.read();
+        int correction = pid(frontQtr.error, true);
+        driver.applyLinePid(correction * -1, true);
+      }
+      driver.stop(100);
+      pushed = true;
+    }
+    count += detectMetal();
+  }
+  digitalWrite(13, LOW);
+  return count;
+
+}
+
+bool foundMetalBox(int count){
+
+  return count >= 1000;
+}
+
+void grabCube(){
+  armDownClose();
+  delay(250);
+
+  spreadGripper();
+  delay(250);
+
+  initEncoder();
+  while(leftEncoder < 50 || rightEncoder < 50){
+    if(leftEncoder == 20 || rightEncoder == 20){
+      gripCube();
+    }
+    goStraight(true, 100);
+  }
+  driver.stop(100);
+
+  attachWrist();
+  writeWrist(50);
+  delay(250);
+
+  attachElbow();
+  writeElbow(35);
+  delay(250);
+
+  turnSpeed = 130;
+  baseSpeed = 90;
+
+}
+
+void exitSemicircle(char orientation){
+  if(orientation == 'n'){
+    lineFollowBackward();
+  }else if(orientation == 'w'){
+    lineFollowBackward('r');
+  }else if(orientation == 'e'){
+    lineFollowBackward('l');
+  }
+
+}
+
+void semicircle(){
+  char orientation = 'n';
+  bool metal = false;
+  
+  initEncoder();
+  while(true){
+    frontQtr.read();
+    if(frontQtr.pattern == 'L' || frontQtr.pattern == 'R' || frontQtr.pattern == 'T'){
+      break;
+    }
+    int correction = pid(frontQtr.error, true);
+    driver.applyLinePid(correction * -1, true);
+  }
+
+  juncToSemicircle = leftEncoder;
+  lineFollowForward('n', true);
+  
+  char dir;
+  if(rightBox){
+    orientation = 'e';
+    if(frontBox){
+      dir = 'l';
+    }else{
+      dir = 'u';
+    }
+  }else if(frontBox){
+    dir = 'l';
+  }else{
+    orientation = 'w';
+  }
+  metal = foundMetalBox(reachBox());
+  if(metal){
+    driver.stop(100);
+    grabCube();
+    exitSemicircle(orientation);
+    return;
+  }
+
+  lineFollowBackward(dir);
+  if(dir == 'l' && orientation == 'e'){orientation = 'n';}
+  else if(dir == 'l' && orientation == 'n'){orientation = 'w';}
+  else if(dir == 'u'){orientation = 'w';}
+  if(orientation == 'w'){
+    reachBox();
+    driver.stop(100);
+    grabCube();
+    exitSemicircle(orientation);
+    return;
+  }
+  metal = foundMetalBox(reachBox());
+  if(metal){
+    driver.stop(100);
+    grabCube();
+    exitSemicircle(orientation);
+    return;
+    
+  }
+
+  dir = 'l';
+  lineFollowBackward(dir);
+  orientation = 'w';
+  reachBox();
+  driver.stop(100);
+  grabCube();
+  exitSemicircle(orientation);
+  return;
+}
+
+void goToPlace(){
+  
+  pushForward(100, false);
+
+  initEncoder();
+  while(leftEncoder < 100 || rightEncoder < 100){
+    rearQtr.read();
+    int correction = pid(rearQtr.error, false);
+    driver.applyLinePid(correction, false, baseSpeed, baseSpeed + 50);
+  }
+
+  
+  lineFollowBackward();
+  turnRightTillMiddle(false);
+
+  initEncoder();
+  while(leftEncoder < 100 || rightEncoder < 100){
+    rearQtr.read();
+    int correction = pid(rearQtr.error, false);
+    driver.applyLinePid(correction, false, 80, 130);
+  }
+
+  driver.stop();
+
+}
+
+void placeCube(){
+
+  autoLinePosition(25, 'f', true);
+  driver.stop(500);
+
+  attachWrist();
+  attachElbow();
+
+  writeElbow(78);
+  delay(250);
+
+  writeWrist(10);
+  delay(250);
+
+  spreadGripper();
+  delay(250);
+
+  armDownClose();
+
+  turnSpeed = 100;
+  baseSpeed = 90;
+
+  attachGripper();
+  gripCube();
+  delay(100);
+
+  detachGripper();
+  detachElbow();
+  detachWrist();
+
+  initEncoder();
+  while(leftEncoder < 160 || rightEncoder < 160){
+    frontQtr.read();
+    int correction = boxPid(frontQtr.error, true);
+    driver.applyLinePid(correction * -1, true, 80, 160);
+  }
+  driver.stop(100);
+
+  spreadGripper();
+  delay(500);
+
+  pushLineForward(50, false, false, 100);
+
+  attachWrist();
+
+  writeWrist(65);
+  delay(100);
+
+  positionArm();
+  delay(100);
+
+  breakForward();
+  pushLineForward(130, true, false, 100);
+
+}
+
+void botStart(){
+  
+  while(true){
+    int reading = readBackLox();
+    if(reading < 100 && reading != -1){
+      delay(1000);
+      pushForward(50, false);
+      break;
+    }
+  }
+
+}
+
+void botEnd(){
+  lineFollowBackward('r');
+
+  while(true){
+    frontQtr.read();
+    if(frontQtr.pattern == 'L' || frontQtr.pattern == 'R' || frontQtr.pattern == 'T'){
+      break;
+    }
+    int correction = pid(frontQtr.error, true);
+    driver.applyLinePid(correction * -1, true);
+  }
+  
+  pushForward(200, true);
+  driver.stop(999999999);
+
+}
+  
+
 
 void botSetup(){
   Serial.begin(9600);
@@ -846,109 +1163,33 @@ void botSetup(){
 
   frontQtr.calibrate(1000);
   rearQtr.calibrate(1000);
-
-}
-int reachBox(){
-  
-  while(readFrontLox() > 150){
-    frontQtr.read();
-    int correction = pid(frontQtr.error, true);
-    driver.applyLinePid(correction * -1, true);
-  }
-
-  autoLinePosition(6, 'f', true);
-
-  int distance = 35;
-  int count = 0;
-  
-  count += pushLineForward(distance, true, false);
-
-  int startTime = millis();
-  while((millis() - startTime) < 1000){
-    count += detectMetal();
-  }
-  startTime = millis();
-  bool pushed = false;
-  while((millis() - startTime) < 1000){
-    if(!pushed){
-      breakForward();
-      pushed = true;
-    }
-    count += detectMetal();
-  }
-  digitalWrite(13, LOW);
-  driver.stop(2000);
-  return count;
-
-}
-
-boolean foundMetalBox(int count){
-  return count >= 1000;
-}
-
-void exitCubeLoc(char orientation){
-  if(orientation == 'n'){
-    lineFollowBackward();
-  }else if(orientation == 'w'){
-    lineFollowBackward('r');
-  }else if(orientation == 'e'){
-    lineFollowBackward('l');
-  }
-  lineFollowBackward();
-}
-
-void grabCube(){
-
 }
 
 void botLoop(){
-  char orientation = 'n';
-  bool metal = false;
+
+  botStart();
+
+  wall();
+
+  reachColourJunction('w');
+  driver.stop(100);
+  char colour = getJuctionColour();
+
+  goToCircle(colour);
+  circle();
   
-  lineFollowForward('n', true);
-  char dir;
-  if(rightBox){
-    orientation = 'e';
-    if(frontBox){
-      dir = 'l';
-    }else{
-      dir = 'u';
-    }
-  }else if(frontBox){
-    dir = 'l';
-  }else{
-    orientation = 'w';
-  }
-  metal = foundMetalBox(reachBox());
-  if(metal){
-    driver.stop();
-    delay(2000);
-    grabCube();
-    exitCubeLoc(orientation);
-  }
+  reachColourJunction(wallColour);
 
-  lineFollowBackward(dir);
-  if(dir == 'l' && orientation == 'e'){orientation = 'n';}
-  else if(dir == 'l' && orientation == 'n'){orientation = 'w';}
-  else if(dir == 'u'){orientation = 'w';}
-  metal = foundMetalBox(reachBox());
-  if(metal){
-    driver.stop();
-    delay(2000);
-    grabCube();
-    exitCubeLoc(orientation);
-    
-  }
+  goToSemicircle(colour);
+  semicircle();
 
-  dir = 'l';
-  lineFollowBackward(dir);
-  orientation = 'w';
-  reachBox();
+  reachColourJunction('r');
 
-  driver.stop();
-  delay(2000);
-  grabCube();
-  exitCubeLoc(orientation);
+  goToPlace();
+
+  placeCube();
+
+  botEnd();
 
 }
 
@@ -962,12 +1203,28 @@ void setup(){
   // rearQtr.calibrate(1);
   // driver.stop();
 
-
 }
 
 void loop(){
+  botLoop();
+
   // armDownClose();
-  // delay(2000);
+  // delay(1000);
+
+  // gripCube();
+  // delay(500);
+
+  // attachElbow();
+  // writeElbow(81);
+  // delay(500);
+
+  // initEncoder();
+  // while(leftEncoder < 190 || rightEncoder < 190){
+  //   frontQtr.read();
+  //   int correction = pid(frontQtr.error, true);
+  //   driver.applyLinePid(correction * -1, true, 80, 130);
+  // }
+  // driver.stop();
 
   // spreadGripper();
   // delay(2000);
@@ -978,9 +1235,9 @@ void loop(){
   // attachWrist();
 
   // writeWrist(45);
-  // delay(500000);
+  // delay(3000);
 
-  botLoop();
+  // botLoop();
   
   // lineFollowBackward('l');
   // lineFollowForward();
