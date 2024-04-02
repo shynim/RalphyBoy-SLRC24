@@ -75,27 +75,42 @@ void writeGripper(int ang){
 
 void gripCube(){
     attachGripper();
-    gripper.write(4);
+    gripper.write(0);
+    delay(100);
+}
+
+void gripBall(){
+    attachGripper();
+    gripper.write(0);
+    delay(100);
+}
+
+void gripSlowly(int del = 20){
+    attachGripper();
+    for(int i = 110;i >= 0;i--){
+        gripper.write(i);
+        delay(del);
+    }
     delay(100);
 }
 
 void spreadGripper(){
     attachGripper();
-    gripper.write(55);
-    delay(80);
+    gripper.write(125);
+    delay(100);
     detachGripper();
 
 }
 
-int elbowStartPos = 40;
-int wristStartPos = 5;
+int elbowStartPos = 30;
+int wristStartPos = 10;
 
-int elbowDownPos = 155;
+int elbowDownPos = 172;
 int wristStraightPos = 115;
 
 void positionArm(){
     attachGripper();
-    writeGripper(0);
+    writeGripper(50);
     delay(500);
     detachGripper();
 
@@ -122,8 +137,8 @@ void armDown(int time, bool spread){
     int elbowAng = elbowStartPos;
     int wristAng = wristStartPos;
 
-    int startTimeElbow = millis();
-    int startTimeWrist = millis();
+    unsigned long startTimeElbow = millis();
+    unsigned long startTimeWrist = millis();
 
     while(elbowAng < elbowDownPos || wristAng < wristStraightPos){
         if((millis() - startTimeElbow) >= elbowDelay && elbowAng < elbowDownPos){
@@ -134,7 +149,7 @@ void armDown(int time, bool spread){
             writeWrist(++wristAng);
             startTimeWrist = millis();
         }
-        if(elbowAng == 120 && spread){
+        if(elbowAng == 100 && spread){
             spreadGripper();
         }
 
@@ -153,8 +168,8 @@ void armUp(int time){
     int elbowAng = elbowDownPos;
     int wristAng = wristStraightPos;
 
-    int startTimeElbow = millis();
-    int startTimeWrist = millis();
+    unsigned long startTimeElbow = millis();
+    unsigned long startTimeWrist = millis();
 
     while(elbowAng > elbowStartPos || wristAng > wristStartPos){
         if((millis() - startTimeElbow) >= elbowDelay && elbowAng > elbowStartPos){
@@ -170,14 +185,29 @@ void armUp(int time){
 
 }
 
+void armBall(){
+    
+    attachWrist();
+    writeWrist(55);
+    delay(100);
+
+    spreadGripper();
+
+    attachElbow();
+    writeElbow(110);
+    delay(500);
+
+}
+
 void armDownClose(){
     attachElbow();
     attachWrist();
     attachGripper();
 
-    writeWrist(45);
+    
+    writeElbow(93);
     delay(500);
-    writeElbow(83);
+    writeWrist(45);
     delay(500);
     spreadGripper();
     delay(500);

@@ -32,7 +32,6 @@ void initColour(){
   digitalWrite(S0, HIGH);
   digitalWrite(S1, LOW);
 
-
 }
 
 int getRedPW() {
@@ -73,12 +72,11 @@ int getBluePW() {
   int PW;
   PW = pulseIn(sensorOut, LOW);
 
-  blueValue = map(PW, blueMin,blueMax,255,0);
+  blueValue = map(PW, blueMin, blueMax, 255, 0);
   delay(100);
   //return PW;
   return blueValue;
 
- 
 }
 
 char getColour(){

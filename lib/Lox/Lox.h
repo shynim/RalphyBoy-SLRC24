@@ -3,7 +3,7 @@
 // address we will assign if dual sensor is present
 #define LOX1_ADDRESS 0x30
 #define LOX2_ADDRESS 0x31
-#define LOX3_ADDRESS 0x32
+#define LOX3_ADDRESS 0x35
 
 // set the pins to shutdown
 #define SHT_LOX1 44
@@ -90,7 +90,7 @@ int readRadarLox(){
 
   if(measure1.RangeStatus != 4) {
     int data = measure1.RangeMilliMeter;
-    if(data < 500){
+    if(data < 5000){
       return data;
     }else{
       return -1;

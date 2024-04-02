@@ -118,8 +118,23 @@ void MotorDriver::brake(){
 }
 
 void MotorDriver::applyLinePid(int correction, bool frwrd, int base, int max) {
-    int leftSpeed = base + correction;
-    int rightSpeed = base - correction;
+    
+    int leftBase;
+    int rightBase;
+
+    if(frwrd){
+        leftBase = base;
+        rightBase = base + 10;
+    }else{
+        leftBase = base + 10;
+        rightBase = base;
+    }
+
+    int leftMax = leftBase + 50;
+    int rightMax = rightBase + 50;
+
+    int leftSpeed = leftBase + correction;
+    int rightSpeed = rightBase - correction;
 
     if (leftSpeed < 0) {
         leftSpeed = 0;
@@ -129,12 +144,12 @@ void MotorDriver::applyLinePid(int correction, bool frwrd, int base, int max) {
         rightSpeed = 0;
     }
 
-    if (leftSpeed >= max) {
-        leftSpeed = max;
+    if (leftSpeed >= leftMax) {
+        leftSpeed = leftMax;
     }
 
-    if (rightSpeed >= max) {
-        rightSpeed = max;
+    if (rightSpeed >= rightMax) {
+        rightSpeed = rightMax;
     }
 
     if(frwrd) forward(leftSpeed, rightSpeed);
@@ -156,9 +171,9 @@ void MotorDriver::applyEncoderPid(int correction, int base){
 }
 
 
-const int wallBaseSpeed = 65;
+const int wallBaseSpeed = 70;
 
-void MotorDriver::applyWallPid(int correction){
+void MotorDriver::applyWallPid(int correction, bool frwrd){
     if(correction > correctionMax){
         correction = correctionMax;
     }else if(correction < correctionMax * -1){
@@ -168,8 +183,9 @@ void MotorDriver::applyWallPid(int correction){
     int leftSpeed = wallBaseSpeed + correction;
     int rightSpeed = wallBaseSpeed - correction;
 
-    if(leftSpeed < 40) leftSpeed = 40;
-    if(rightSpeed < 40) rightSpeed = 40;
+    if(leftSpeed < 45) leftSpeed = 45;
+    if(rightSpeed < 45) rightSpeed = 45;
 
-    forward(leftSpeed, rightSpeed);
+    if(frwrd) forward(leftSpeed, rightSpeed);
+    else backward(leftSpeed, rightSpeed);
 }

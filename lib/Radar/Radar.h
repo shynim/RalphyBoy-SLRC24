@@ -11,6 +11,8 @@ Servo radarServo;
 Servo railServo;
 Tof radarLox(const_cast<int *>((const int[]) {xshut, 1, 0}));
 
+int gemB = 0;
+
 void initRadar(){
     pinMode(xshut, OUTPUT);
     radarServo.attach(radarPin);
@@ -34,7 +36,21 @@ void detachRadar(){
     radarServo.detach();
 }
 
-void readRadar(){
-    radarLox.read();
+void railUp(int del){
+    railServo.attach(railPin);
+    railServo.writeMicroseconds(1445); //1480 down // 
+    delay(del);
+    railServo.detach();
+}
+
+void railDown(int del){
+    railServo.attach(railPin);
+    railServo.writeMicroseconds(1480); //1480 down // 
+    delay(del);
+    railServo.detach();
+}
+
+int readRadar(){
+    //return readRadarLox();
     //Serial.print(radarLox.reading);
 }

@@ -19,6 +19,12 @@ void initMetalDetector(){
     pinMode(pin_cap, INPUT);
     pinMode(pin_LED, OUTPUT);
     digitalWrite(pin_LED, LOW);
+
+    sumsum = 0; //running sum of 64 sums
+    skip = 0; //number of skipped sums
+    diff = 0;      //difference between sum and avgsum
+    flash_period = 0; //period (in ms)
+    prev_flash = 0;
 }
 
 int detectMetal(){
@@ -49,7 +55,7 @@ int detectMetal(){
         sum += val;
     
         //determine if LEDs should be on or off
-        long unsigned int timestamp = millis();
+        unsigned long timestamp = millis();
         byte ledstat = 0;
         if (timestamp < prev_flash +12) {
         if (diff > 0)ledstat = 1;

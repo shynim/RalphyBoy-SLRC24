@@ -10,6 +10,7 @@ public:
     int error = 0;
     uint16_t panelReading[8];
     uint16_t rawReadings[8];
+    bool foundLine;
     bool isMiddle;
     bool isEnd;
     bool junc;

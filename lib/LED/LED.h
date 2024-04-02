@@ -10,6 +10,20 @@ void turnOffAllLeds(){
 
 }
 
+void turnOff1Leds(){
+    digitalWrite(A1, HIGH);
+    digitalWrite(A14, HIGH);
+    digitalWrite(17, HIGH);
+
+}
+
+void turnOff2Leds(){
+    digitalWrite(A2, HIGH);
+    digitalWrite(A3, HIGH);
+    digitalWrite(A4, HIGH);
+
+}
+
 void initLED(){
     pinMode(A1, OUTPUT);
     pinMode(A2, OUTPUT);
@@ -22,8 +36,9 @@ void initLED(){
 }
 
 void light(int led, char colour){
-    turnOffAllLeds();
+    
     if(led == 1){
+        turnOff1Leds();
         if(colour == 'r'){
             digitalWrite(A1, LOW);
         }else if(colour == 'g'){
@@ -35,6 +50,7 @@ void light(int led, char colour){
         }
 
     }else if(led == 2){
+        turnOff2Leds();
         if(colour == 'r'){
             digitalWrite(A3, LOW);
 
